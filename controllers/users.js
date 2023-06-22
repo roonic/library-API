@@ -6,25 +6,29 @@ const Transaction = require('../models/Transactions')
 
 const getAllUsers = async (req, res) => {
   try {
-    const { username } = req.query
     const queryObject = {}
+    if (req.user.isAdmin) {
+    const { username } = req.query
   
     if (username) {
       queryObject.username = { [Op.like]: username + '%'}
     }
+  }
+  else {
+    queryObject.id = req.user.userId
+  }
+  const page = Number(req.query.page) || 1
+  const limit = Number(req.query.limit) || 10
+  const skip = (page - 1) * limit
 
-    const page = Number(req.query.page) || 1
-    const limit = Number(req.query.limit) || 10
-    const skip = (page - 1) * limit
-
-    let result = await User.findAll({
-      where: queryObject,
-      attributes: [
-        'username', 'email', 'id' 
-      ],
-      offset: skip,
-      limit: limit
-    })
+  let result = await User.findAll({
+    where: queryObject,
+    attributes: [
+      'username', 'email', 'id' 
+    ],
+    offset: skip,
+    limit: limit
+  })
     // console.log(result)
 
     res.status(StatusCodes.OK).json({result, nbHits: result.length})

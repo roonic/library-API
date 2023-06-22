@@ -6,28 +6,32 @@ const { Op } = require('sequelize')
 
 const getAllTransactions = async (req, res) => {
   try {
-    const { book, username } = req.query
     const queryObject = {}
+    if (req.user.isAdmin) {
+      const { book, username } = req.query
 
-    if (book) {
-      const book =  await Book.findOne({
-        attributes: ['id'],
-        where: { 
-          title: { [Op.like]: book + '%'}
-        }
-    })
-    queryObject.bookId = book[0].dataValues.id
+      if (book) {
+        const book =  await Book.findOne({
+          attributes: ['id'],
+          where: { 
+            title: { [Op.like]: book + '%'}
+          }
+      })
+      queryObject.bookId = book[0].dataValues.id
+      }
+    
+      if (username) {
+        const userID =  await User.findOne({
+          attributes: ['id'],
+          where: {...username}
+      })
+      queryObject.userId= userID[0].dataValues.id
+      // console.log(queryObject.genre_id)
+      }
     }
-  
-    if (username) {
-      const userID =  await User.findOne({
-        attributes: ['id'],
-        where: {...username}
-    })
-    queryObject.userId= userID[0].dataValues.id
-    // console.log(queryObject.genre_id)
+    else {
+      queryObject.userId = req.user.userId
     }
-
     const page = Number(req.query.page) || 1
     const limit = Number(req.query.limit) || 10
     const skip = (page - 1) * limit
