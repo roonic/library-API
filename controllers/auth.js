@@ -9,7 +9,7 @@ const register = async (req, res) => {
   const queryObject = {}
   const { username, email, password } = req.body
 
-  if (password.startsWith('lib-admin')) {
+  if (password.startsWith(process.env.ADMIN_AUTH)) {
     queryObject.admin = true
   }
   queryObject.username = username
