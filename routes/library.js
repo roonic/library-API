@@ -1,4 +1,5 @@
 const express = require('express')
+const adminAuth = require('../middleware/adminauth')
 
 const {
   getAllBooks,
@@ -20,11 +21,11 @@ const {
 
 const router = express.Router()
 
-router.route('/books').get(getAllBooks).post(addBooks)
-router.route('/books/:id').patch(updateBook)
+router.route('/books').get(getAllBooks).post(adminAuth, addBooks)
+router.route('/books/:id').patch(adminAuth, updateBook)
 router.route('/transactions').get(getAllTransactions).post(createTransaction)
 router.route('/transactions/:id').patch(updateTransaction)
 router.route('/users').get(getAllUsers).delete(deleteUser)
-router.route('/users/:id').patch(updateUser).delete(deleteUser)
+router.route('/users/:id').patch(updateUser).delete(adminAuth, deleteUser)
 
 module.exports = router
